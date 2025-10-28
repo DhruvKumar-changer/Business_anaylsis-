@@ -57,7 +57,7 @@ class LLMAgent:
             • Cash Flow Health: {kpis['cash_flow_health']}
             • Market Position: {kpis['market_position']}
             """
-    #LLM prompt that guide it 
+         #LLM prompt that guide it 
         prompt = f"""
         You are an highly expert business performance analyst and startup mentor.
 
@@ -113,13 +113,16 @@ class LLMAgent:
 
         Make the report extremely insightful, actionable, and easy to read.
         If something looks dangerous or risky, mention it clearly in the alerts section.
+        Ensure the response is strictly valid JSON — no explanations, no markdown.
+
         """
 
-        #Resturn the result 
+        #Return the result 
         response = self.client.chat.completions.create(
             messages=[
                 {"role": "system" , "content": "You are a highly skilled business analyst."},
                 {"role": "user" , "content": prompt}
-            ]
+            ],
+            model="llama-3.1-8b-instant"
         )
         return response.choices[0].message.content
