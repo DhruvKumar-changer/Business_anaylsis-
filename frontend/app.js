@@ -1,75 +1,60 @@
-// Elements Initialization
-const form = document.getElementById('businessForm');
-const loadingState = document.getElementById('loadingState');
-const formSection = document.getElementsByClassName('form-section');
-const btn = document.getElementsByClassName('btn-analyze')
+const button = document.getElementById('getStartedBtn');
 
-for (let section of formSection) {
-  section.style.display = "none";
+function showGetStartedButton() {
+  setTimeout(() => {
+    button.classList.add('visible');
+  }, 3000);
 }
 
-function displayForm() {
-  for (let section of formSection) {
-    section.style.display = "inline";
-  }
+function handleGetStartedClick() {
+  button.addEventListener('click', () => {
+    console.log('Get Started clicked!');
+  });
 }
 
-setTimeout(displayForm, 5500);
-
-// JWhen form submit
-// Form submit handler
-form.addEventListener('submit', async function(e) {
-    e.preventDefault(); // Page reload nahi hoga
-    
-    // Get form data
-    const companyName = document.getElementById('companyName').value;
-    const industry = document.getElementById('industry').value;
-    const csvFile = document.getElementById('csvFile').files[0];
-    
-    // Validation
-    if (!companyName || !industry || !csvFile) {
-        alert('⚠️ Please fill all fields!');
-        return;
-    }
-    
-    // Show loading state
-    form.style.display = 'none';
-    loadingState.style.display = 'block';
-    
-    // ========== SAVE DATA TO localStorage ==========
-    const formData = {
-        companyName: companyName,
-        industry: industry,
-        fileName: csvFile.name,
-        analysisDate: new Date().toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
-    };
-    
-    // Save to localStorage
-    localStorage.setItem('businessData', JSON.stringify(formData));
-    console.log('✅ Data saved:', formData);
-    
-    // Simulate processing (2 seconds)
-    setTimeout(function() {
-        // Redirect to dashboard
-        window.location.href = 'dashboard.html';
-    }, 2000);
-    
-    // TODO: Later, when Himanshu's backend ready:
-    // const uploadData = new FormData();
-    // uploadData.append('company', companyName);
-    // uploadData.append('industry', industry);
-    // uploadData.append('file', csvFile);
-    // 
-    // const response = await fetch('http://localhost:5000/analyze', {
-    //     method: 'POST',
-    //     body: uploadData
-    // });
-    // const result = await response.json();
-    // localStorage.setItem('analysisResults', JSON.stringify(result));
+document.addEventListener('DOMContentLoaded', () => {
+  showGetStartedButton();
 });
 
-console.log('✅ JavaScript loaded successfully!');
+button.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Redirect to analytics page
+    window.location.href = 'survey.html';
+});
+
+/************************  Survey JS *********************** */
+
+const form = document.getElementById('surveyForm');
+  const inputs = form.querySelectorAll('input, select, textarea');
+
+  // Radio and checkbox selection animation
+  document.querySelectorAll('.radio-option').forEach(option => {
+      option.addEventListener('click', function() {
+          const radio = this.querySelector('input[type="radio"]');
+          const group = radio.name;
+          document.querySelectorAll(`input[name="${group}"]`).forEach(r => {
+              r.closest('.radio-option').classList.remove('selected');
+          });
+          this.classList.add('selected');
+          radio.checked = true;
+      });
+  });
+
+  document.querySelectorAll('.checkbox-option').forEach(option => {
+      option.addEventListener('click', function(e) {
+          if (e.target.tagName !== 'INPUT') {
+              const checkbox = this.querySelector('input[type="checkbox"]');
+              checkbox.checked = !checkbox.checked;
+          }
+          this.classList.toggle('selected', this.querySelector('input[type="checkbox"]').checked);
+      });
+  });
+
+  // Form submission
+  form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Redirect to analytics page
+      window.location.href = 'analytics.html';
+  });

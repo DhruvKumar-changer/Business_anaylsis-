@@ -1,101 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Business Analyzer</title>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Business Analytics - Transform Your Data</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <video autoplay muted class="video-bg" src="assets/landing_video.mp4"></video>
-        <!-- Navbar with Logo -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <!-- Logo Section -->
-            <div class="logo-section">
-                <!-- Option 1: If you have logo image -->
-                <span class="logo-emoji">🦈</span>
-                <span class="logo-text">AI Business Analyzer</span>
-                
-                <!-- Option 2: If using emoji (remove above, use this) -->
-                <!-- <span class="logo-emoji">🦈</span>
-                <span class="logo-text">AI Business Analyzer</span> -->
-            </div>
+      <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
 
-            <!-- Navigation Links -->
-            <div class="nav-link">
-                <a href="index.html" class="active">Home</a>
-                <a href="#">Features</a>
-                <a href="#">About</a>
-            </div>
+      <header class="header">
+        <div class="logo">DataInsight</div>
+        <nav class="nav">
+          <a href="#features">Features</a>
+          <a href="#analytics">Analytics</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </header>
+
+      <main class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            <span class="title-line">Transform Your</span>
+            <span class="title-line">Business Data Into</span>
+            <span class="title-line gradient-text">Actionable Insights</span>
+          </h1>
+
+          <p class="hero-description">
+            Harness the power of advanced analytics to make data-driven decisions,
+            optimize operations, and accelerate growth with real-time insights.
+          </p>
+
+          <button class="cta-button" id="getStartedBtn">
+            Get Started
+            <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
-    </nav>
-        <!-- Header -->
-        <header>
-            <h1>AI Business Analyzer</h1>
-            <p>Get Shark Tank Style Analysis in Minutes!</p>
-        </header>
 
-        <!-- Main Form -->
-        <main class="form-section">
-            <div class="fade-in form-card">
-                <h2>Upload Your Business Data</h2>
-                
-                <form id="businessForm">
-                    <!-- Company Name -->
-                    <div class="form-group">
-                        <label for="companyName">Company Name</label>
-                        <input type="text" 
-                               id="companyName" 
-                               placeholder="Enter your company name" 
-                               required>
-                    </div>
+        <div class="hero-visual">
+          <div class="chart-container">
+            <div class="chart-bar" style="--height: 60%; --delay: 0s;"></div>
+            <div class="chart-bar" style="--height: 80%; --delay: 0.1s;"></div>
+            <div class="chart-bar" style="--height: 45%; --delay: 0.2s;"></div>
+            <div class="chart-bar" style="--height: 90%; --delay: 0.3s;"></div>
+            <div class="chart-bar" style="--height: 70%; --delay: 0.4s;"></div>
+            <div class="chart-bar" style="--height: 85%; --delay: 0.5s;"></div>
+          </div>
 
-                    <!-- Industry -->
-                    <div class="form-group">
-                        <label for="industry">Industry</label>
-                        <select id="industry" required>
-                            <option value="">Select Industry</option>
-                            <option value="technology">Technology</option>
-                            <option value="retail">Retail</option>
-                            <option value="healthcare">Healthcare</option>
-                            <option value="food">Food & Beverage</option>
-                            <option value="education">Education</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
+          <div class="floating-card card-1">
+            <div class="card-icon">📊</div>
+            <div class="card-text">Real-time Analytics</div>
+          </div>
 
-                    <!-- File Upload -->
-                    <div class="form-group">
-                        <label for="csvFile">Upload Sales Data (CSV)</label>
-                        <input type="file" 
-                               id="csvFile" 
-                               accept=".csv" 
-                               required>
-                        <small>Upload CSV with: Date, Product, Revenue, Cost</small>
-                    </div>
+          <div class="floating-card card-2">
+            <div class="card-icon">📈</div>
+            <div class="card-text">Growth Tracking</div>
+          </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn-analyze">
-                        🚀 Analyze My Business
-                    </button>
-                </form>
-
-                <!-- Loading Animation (hidden initially) -->
-                <div id="loadingState" class="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyzing your data... Please wait!</p>
-                </div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <!-- <footer>
-            <p>Made with ❤️ by Team Dhruv</p>
-        </footer> -->
+          <div class="floating-card card-3">
+            <div class="card-icon">🎯</div>
+            <div class="card-text">Target Achievement</div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <script src="app.js"></script>
-</body>
+    <script type="module" src="app.js"></script>
+  </body>
 </html>
