@@ -4,6 +4,8 @@ from data_loader import Dataloader
 from data_cleaner import DataCleaner
 from kpi_calculator import KPICalculator
 from llm_agent import LLMAgent
+import json
+from database import BusinessDatabase
 
 
 
@@ -49,6 +51,10 @@ def analyze_business():
     #Get the file name from the request
     data = request.get_json()
     filename = data.get("filename")
+    business_name = data.get('business_name') #comes from the frontend
+    industry = data.get('industry')
+    business_type = data.get('business_type')
+    
     #check the file name is provided or not 
     if not filename:
         return jsonify({
@@ -64,6 +70,10 @@ def analyze_business():
     try:
         #Step 1 : loading the csv file given by the user 
         loader = Dataloader(filepath)   #file is loaded
+        if loader.load_csv() is None or loader.load_csv().empty:
+            return jsonify({
+                'error' : 'Failed to load data'
+            }),500
         if not loader.load_csv():
             return jsonify({
                 'error': 'file not loaded'
@@ -75,9 +85,21 @@ def analyze_business():
         #Step 3 : Performing the KPI calculations on the data
         calculator = KPICalculator(cleaner_df)
         kpis = calculator.get_all_kpis()
-        #Step 4 : Return the results after the anaylze
+        print("KPIS generated:",list(kpis.keys()))
+        #Step 4 : Save the data in the database
+        db  = BusinessDatabase()
+        db.connect()
+        db.create_tables()
+        #insert business
+        business_id = db.insert_business(business_name,industry,business_type)
+        #insert analysis
+        analysis_id = db.insert_analysis(business_id,kpis)
+        db.close()   #database save
+        #Step 5 : Return the results after the anaylze
         return jsonify({
             'message': 'Analysis Complete!',
+            'business_id': business_id,
+            'analysis' : analysis_id,
             'kpis' : kpis
         }),200
     except Exception as e:
@@ -103,9 +125,10 @@ def get_recommendations():
         #Generating the recommendation for llm 
         recommendations = agent.generate_recommendations(kpis)
         #parse the json file by using the json.loads() for easy use in frontend 
-        
-
-
+        try:
+            rec_json = json.loads(recommendations)
+        except:
+            rec_json = {"raw txt" : recommendations}
         return jsonify({
             'message': 'Recommendations genrated successfully',
             'recommendations' : recommendations
@@ -115,6 +138,22 @@ def get_recommendations():
             'error' : str(e)
         }),500
 
+#route for fetching the past analyses
+@app.route('/history/<int:business_id>', methods = ['GET'])
+def get_history(business_id):
+    try:
+        db = BusinessDatabase()
+        db.connect()
+        #business details
+        business = db.get_business_by_id(business_id)
+        analyses = db.get_all_analyses(business_id)
+        db.close()
+        return jsonify({
+            'busienss' : business,
+            'analyses': analyses
+        }) ,200
+    except Exception as e:
+        return jsonify({'error':str(e)}),500
 
 #runing the app
 if __name__ == "__main__":
