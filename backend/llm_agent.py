@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 class LLMAgent:
     def __init__(self):
         load_dotenv()
-        self.client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+        self.client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
 
     def generate_recommendations(self , kpis):
         business_info = f"""

@@ -12,7 +12,7 @@ chat_completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "Explain the importance of fast language models",
+            "content": "what is api",
         }
     ],
     model="llama-3.1-8b-instant"

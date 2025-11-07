@@ -4,6 +4,8 @@ from data_loader import Dataloader
 from data_cleaner import DataCleaner
 from kpi_calculator import KPICalculator
 from llm_agent import LLMAgent
+import json
+from database import BusinessDatabase
 
 # HIMANSHU'S ML MODULES (NEW IMPORTS)
 from feature_engineer import FeatureEngineer
@@ -320,6 +322,22 @@ def generate_charts():
             'error': str(e)
         }), 500
 
+#route for fetching the past analyses
+@app.route('/history/<int:business_id>', methods = ['GET'])
+def get_history(business_id):
+    try:
+        db = BusinessDatabase()
+        db.connect()
+        #business details
+        business = db.get_business_by_id(business_id)
+        analyses = db.get_all_analyses(business_id)
+        db.close()
+        return jsonify({
+            'busienss' : business,
+            'analyses': analyses
+        }) ,200
+    except Exception as e:
+        return jsonify({'error':str(e)}),500
 
 # running the app
 if __name__ == "__main__":
