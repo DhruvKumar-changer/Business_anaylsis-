@@ -8,3 +8,11 @@ reports/*.pdf
 .DS_Store
 node_modules/
 
+# ML Models (large binary files)
+models/*.pkl
+*.pkl
+
+# Testing files (temporary)
+test_*.py
+test_*.csv
+sample_*.csv
