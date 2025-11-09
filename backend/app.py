@@ -6,6 +6,7 @@ from kpi_calculator import KPICalculator
 from llm_agent import LLMAgent
 import json
 from database import BusinessDatabase
+from entry_questions import BusinessQuestions
 
 # HIMANSHU'S ML MODULES (NEW IMPORTS)
 from feature_engineer import FeatureEngineer
@@ -29,6 +30,56 @@ def home():
         "message": "Business Analyzer API",
         "status": "success"
     })
+
+
+# Add this route after existing routes
+@app.route("/questions", methods=["GET"])
+def get_entry_questions():
+    """Get entry-level onboarding questions"""
+    try:
+        questions = BusinessQuestions.get_questions()
+        return jsonify({
+            'success': True,
+            'questions': questions
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route("/submit-profile", methods=["POST"])
+def submit_business_profile():
+    """Submit business profile after questions"""
+    try:
+        data = request.get_json()
+        answers = data.get('answers')
+        
+        # Validate answers
+        is_valid, error = BusinessQuestions.validate_answers(answers)
+        if not is_valid:
+            return jsonify({'error': error}), 400
+        
+        # Create profile
+        profile = BusinessQuestions.create_business_profile(answers)
+        
+        # Save to database
+        db = BusinessDatabase()
+        db.connect()
+        business_id = db.insert_business(
+            profile['business_name'],
+            profile['industry'],
+            profile['business_type']
+        )
+        db.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Profile created successfully',
+            'business_id': business_id,
+            'profile': profile
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # defining the upload route
 @app.route("/upload", methods=["POST"])

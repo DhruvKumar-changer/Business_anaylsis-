@@ -56,7 +56,44 @@ def test_backend():
         "recommendations": recommendations,
         "status": "success"
     }
-    import numpy as np
+    # Step 7: Test ML Predictions
+    print("\n📈 Testing ML Predictions...")
+    from feature_engineer import FeatureEngineer
+    from ml_predictor import MLPredictor
+
+    engineer = FeatureEngineer(cleaned_df)
+    engineer.create_time_features()
+    engineer.create_lag_features(column='Revenue', lags=[1, 2, 3])
+    engineer.create_rolling_features(column='Revenue', windows=[3, 5])
+    engineer.create_growth_rate(column='Revenue')
+    engineer.drop_missing_rows()
+
+    X, y = engineer.prepare_ml_data(target_column='Revenue')
+
+    predictor = MLPredictor()
+    metrics = predictor.train_models(X, y, test_size=0.2)
+    predictor.save_model('../models/sales_predictor.pkl')
+
+    last_features = X.iloc[-1].values
+    predictions = predictor.predict_next_periods(last_features, num_periods=6)
+
+    result['ml_predictions'] = {
+        'model': predictor.best_model_name,
+        'accuracy': metrics[predictor.best_model_name.lower().replace(' ', '_')]['R2'],
+        'future_6_months': predictions
+    }
+
+    # Step 8: Test Chart Generation
+    print("\n📊 Testing Charts...")
+    from visualizations import ChartGenerator
+
+    generator = ChartGenerator()
+    revenue_chart = generator.revenue_trend_chart(cleaned_df, 'Date', 'Revenue')
+
+    result['charts_generated'] = True
+    result['chart_sample_length'] = len(revenue_chart) if revenue_chart else 0
+
+    
     def convert_np(obj):
         if isinstance(obj, np.integer):
             return int(obj)
