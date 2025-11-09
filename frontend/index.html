@@ -3,99 +3,516 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Business Analyzer</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>AI Business Analyzer - Onboarding</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1em;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload {
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+
+        .file-upload:hover {
+            background: #eef1ff;
+            border-color: #5568d3;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            background: #f8f9ff;
+            border-color: #667eea;
+        }
+
+        .checkbox-item input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: -50%;
+            width: 100%;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+
+        .step:first-child::before {
+            display: none;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step.active .step-number {
+            background: #667eea;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+        }
+
+        .step.active .step-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <video autoplay muted class="video-bg" src="assets/landing_video.mp4"></video>
-        <!-- Navbar with Logo -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <!-- Logo Section -->
-            <div class="logo-section">
-                <!-- Option 1: If you have logo image -->
-                <span class="logo-emoji">🦈</span>
-                <span class="logo-text">AI Business Analyzer</span>
-                
-                <!-- Option 2: If using emoji (remove above, use this) -->
-                <!-- <span class="logo-emoji">🦈</span>
-                <span class="logo-text">AI Business Analyzer</span> -->
-            </div>
-
-            <!-- Navigation Links -->
-            <div class="nav-link">
-                <a href="index.html" class="active">Home</a>
-                <a href="#">Features</a>
-                <a href="#">About</a>
-            </div>
+        <div class="header">
+            <h1>🚀 AI Business Analyzer</h1>
+            <p>Let's analyze your business and unlock growth insights</p>
         </div>
-    </nav>
-        <!-- Header -->
-        <header>
-            <h1>AI Business Analyzer</h1>
-            <p>Get Shark Tank Style Analysis in Minutes!</p>
-        </header>
 
-        <!-- Main Form -->
-        <main class="form-section">
-            <div class="fade-in form-card">
-                <h2>Upload Your Business Data</h2>
-                
-                <form id="businessForm">
-                    <!-- Company Name -->
+        <div class="form-container">
+            <div class="progress-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Goals</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Operations</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Data Upload</div>
+                </div>
+            </div>
+
+            <form id="onboardingForm">
+                <!-- SECTION 1: Basic Info -->
+                <div class="section" data-step="1">
+                    <h2 class="section-title">📋 Basic Information</h2>
+                    
                     <div class="form-group">
-                        <label for="companyName">Company Name</label>
-                        <input type="text" 
-                               id="companyName" 
-                               placeholder="Enter your company name" 
-                               required>
+                        <label>What is your business name? <span class="required">*</span></label>
+                        <input type="text" name="business_name" placeholder="e.g., Sharma Electronics" required>
                     </div>
 
-                    <!-- Industry -->
                     <div class="form-group">
-                        <label for="industry">Industry</label>
-                        <select id="industry" required>
+                        <label>Which industry does your business belong to? <span class="required">*</span></label>
+                        <select name="industry" required>
                             <option value="">Select Industry</option>
-                            <option value="technology">Technology</option>
-                            <option value="retail">Retail</option>
-                            <option value="healthcare">Healthcare</option>
-                            <option value="food">Food & Beverage</option>
-                            <option value="education">Education</option>
-                            <option value="other">Other</option>
+                            <option value="E-commerce">E-commerce</option>
+                            <option value="Retail">Retail</option>
+                            <option value="SaaS/Software">SaaS/Software</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Services">Services</option>
+                            <option value="Food & Beverage">Food & Beverage</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Education">Education</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
-                    <!-- File Upload -->
                     <div class="form-group">
-                        <label for="csvFile">Upload Sales Data (CSV)</label>
-                        <input type="file" 
-                               id="csvFile" 
-                               accept=".csv" 
-                               required>
-                        <small>Upload CSV with: Date, Product, Revenue, Cost</small>
+                        <label>What type of business is this? <span class="required">*</span></label>
+                        <select name="business_type" required>
+                            <option value="">Select Type</option>
+                            <option value="Startup (0-2 years)">Startup (0-2 years)</option>
+                            <option value="Growing Business (2-5 years)">Growing Business (2-5 years)</option>
+                            <option value="Established Business (5+ years)">Established Business (5+ years)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Financial Goals -->
+                <div class="section" data-step="2">
+                    <h2 class="section-title">🎯 Financial Goals</h2>
+                    
+                    <div class="form-group">
+                        <label>What is your primary goal? <span class="required">*</span></label>
+                        <select name="primary_goal" required>
+                            <option value="">Select Goal</option>
+                            <option value="Increase Revenue">Increase Revenue</option>
+                            <option value="Reduce Costs">Reduce Costs</option>
+                            <option value="Improve Profit Margins">Improve Profit Margins</option>
+                            <option value="Prepare for Funding/IPO">Prepare for Funding/IPO</option>
+                            <option value="Scale Operations">Scale Operations</option>
+                            <option value="General Health Check">General Health Check</option>
+                        </select>
                     </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn-analyze">
-                        🚀 Analyze My Business
-                    </button>
-                </form>
-
-                <!-- Loading Animation (hidden initially) -->
-                <div id="loadingState" class="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyzing your data... Please wait!</p>
+                    <div class="form-group">
+                        <label>Are you looking for external funding? <span class="required">*</span></label>
+                        <select name="seeking_funding" required>
+                            <option value="">Select Option</option>
+                            <option value="Yes - Angel/Seed Round">Yes - Angel/Seed Round</option>
+                            <option value="Yes - Series A/B">Yes - Series A/B</option>
+                            <option value="Yes - IPO Preparation">Yes - IPO Preparation</option>
+                            <option value="No - Self-funded">No - Self-funded</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </main>
 
-        <!-- Footer -->
-        <!-- <footer>
-            <p>Made with ❤️ by Team Dhruv</p>
-        </footer> -->
+                <!-- SECTION 3: Operational Details -->
+                <div class="section" data-step="3">
+                    <h2 class="section-title">⚙️ Operational Details</h2>
+                    
+                    <div class="form-group">
+                        <label>How many products/services do you offer?</label>
+                        <input type="number" name="product_count" placeholder="e.g., 10" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>What is your current monthly revenue (approximate)?</label>
+                        <select name="monthly_revenue">
+                            <option value="">Select Range</option>
+                            <option value="Less than ₹1 Lakh">Less than ₹1 Lakh</option>
+                            <option value="₹1-5 Lakhs">₹1-5 Lakhs</option>
+                            <option value="₹5-10 Lakhs">₹5-10 Lakhs</option>
+                            <option value="₹10-50 Lakhs">₹10-50 Lakhs</option>
+                            <option value="₹50 Lakhs - 1 Crore">₹50 Lakhs - 1 Crore</option>
+                            <option value="More than ₹1 Crore">More than ₹1 Crore</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What are your biggest concerns? (Select all that apply)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="concerns" value="High operational costs">
+                                <span>High operational costs</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="concerns" value="Low profit margins">
+                                <span>Low profit margins</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="concerns" value="Cash flow problems">
+                                <span>Cash flow problems</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="concerns" value="Slow growth">
+                                <span>Slow growth</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="concerns" value="Market competition">
+                                <span>Market competition</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="concerns" value="Customer retention">
+                                <span>Customer retention</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Data Upload -->
+                <div class="section" data-step="4">
+                    <h2 class="section-title">📂 Upload Your Business Data</h2>
+                    
+                    <div class="form-group">
+                        <label>Upload CSV File <span class="required">*</span></label>
+                        <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" id="fileInput" name="data_file" accept=".csv" required>
+                            <div class="file-upload-label">
+                                📁 Click to upload or drag and drop<br>
+                                <small style="color: #7f8c8d;">CSV file with Date, Revenue, Costs columns</small>
+                            </div>
+                            <div class="file-name" id="fileName"></div>
+                        </div>
+                        <div class="help-text">Required columns: Date, Product_Name, Revenue, Costs_Of_Goods, Marketing_Cost, etc.</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    🚀 Analyze My Business
+                </button>
+            </form>
+        </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.getElementById('fileName').textContent = `✅ Selected: ${fileName}`;
+            }
+        });
+
+        // Form submission
+        document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Uploading...';
+
+            // Get form data
+            const formData = new FormData(this);
+            
+            // Get concerns as array
+            const concerns = [];
+            document.querySelectorAll('input[name="concerns"]:checked').forEach(cb => {
+                concerns.push(cb.value);
+            });
+
+            // Create answers object
+            const answers = {
+                business_name: formData.get('business_name'),
+                industry: formData.get('industry'),
+                business_type: formData.get('business_type'),
+                primary_goal: formData.get('primary_goal'),
+                seeking_funding: formData.get('seeking_funding'),
+                product_count: formData.get('product_count'),
+                monthly_revenue: formData.get('monthly_revenue'),
+                concerns: concerns
+            };
+
+            try {
+                // Step 1: Upload file
+                const fileFormData = new FormData();
+                const file = formData.get('data_file');
+                fileFormData.append('file', file);
+
+                const uploadResponse = await fetch('http://localhost:5000/upload', {
+                    method: 'POST',
+                    body: fileFormData
+                });
+
+                if (!uploadResponse.ok) throw new Error('File upload failed');
+                const uploadData = await uploadResponse.json();
+                
+                submitBtn.textContent = '⏳ Creating profile...';
+
+                // Step 2: Submit profile
+                const profileResponse = await fetch('http://localhost:5000/submit-profile', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({answers: answers})
+                });
+
+                if (!profileResponse.ok) throw new Error('Profile creation failed');
+                const profileData = await profileResponse.json();
+
+                submitBtn.textContent = '⏳ Analyzing...';
+
+                // Step 3: Analyze business
+                const analyzeResponse = await fetch('http://localhost:5000/analyze', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({filename: uploadData.filename})
+                });
+
+                if (!analyzeResponse.ok) throw new Error('Analysis failed');
+                const analyzeData = await analyzeResponse.json();
+
+                // Save to sessionStorage and redirect
+                sessionStorage.setItem('businessData', JSON.stringify({
+                    business_id: profileData.business_id,
+                    profile: profileData.profile,
+                    kpis: analyzeData.kpis,
+                    filename: uploadData.filename
+                }));
+
+                window.location.href = 'loading.html';
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Analyze My Business';
+            }
+        });
+    </script>
 </body>
 </html>
