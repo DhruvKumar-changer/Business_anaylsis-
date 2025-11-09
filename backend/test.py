@@ -6,9 +6,20 @@ from kpi_calculator import KPICalculator
 from llm_agent import LLMAgent
 from database import BusinessDatabase
 import numpy as np
+from groq import Groq
+from dotenv import load_dotenv
 
-# Set up environment (ensure .env has GROQ_API_KEY and DB credentials)
-os.environ['GROQ_API_KEY'] ='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'  # Replace with actual key
+# Load environment variables from .env
+load_dotenv()
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+if not GROQ_API_KEY:
+    raise ValueError("GROQ_API_KEY not found in environment")
+
+# Optional: Initialize Groq client only if you need it in this file
+# from groq import Groq
+# client = Groq(api_key=GROQ_API_KEY)
+
+# Database credentials can be hardcoded or moved to .env for safety
 os.environ['DB_HOST'] = 'localhost'
 os.environ['DB_USER'] = 'root'
 os.environ['DB_PASSWORD'] = 'dhruv'  # Use secure password
