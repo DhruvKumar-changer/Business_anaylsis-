@@ -154,7 +154,7 @@ class KPICalculator:
         return {
         "Costs_Of_Goods" : round((self.df["Costs_Of_Goods"].sum() / total) * 100,2),
         "Marketing_Cost" : round((self.df["Marketing_Cost"].sum() / total) * 100,2),
-        "Logistic_Cost " : round((self.df["Logistic_Cost"].sum() / total) * 100,2),
+        "Logistic_Cost" : round((self.df["Logistic_Cost"].sum() / total) * 100,2),
         "Other_Cost"     : round((self.df["Other_Cost"].sum() / total) * 100,2)
         }
 

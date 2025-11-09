@@ -12,9 +12,9 @@ from database import BusinessDatabase
 app = Flask(__name__) #initialize the flask app
 
 #Set the upload folder
-UPLOAD_FOLDER = "../data/upload"    #path
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER  #configure the upload folder 
-
+app.config['UPLOAD_FOLDER'] = '../data/upload'
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 #HOME ROUTE for test 
 @app.route("/")  #Decorator, when request comes than run this function
 def home():
@@ -37,8 +37,9 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': "File is not selected"}),400
     #save file 
-    file_path = os.path.join(app.config["UPLOAD_FOLDER"],file.filename)  #join both the paths and send the file in the upload folder
-    file.save(file_path)  #save the file 
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+    file_path = file_path.replace('\\', '/')  # Fix path separators
+    file.save(file_path)
     #return success message
     return jsonify({
         "sucess":"File uploaded successfully",
@@ -70,14 +71,11 @@ def analyze_business():
     try:
         #Step 1 : loading the csv file given by the user 
         loader = Dataloader(filepath)   #file is loaded
-        if loader.load_csv() is None or loader.load_csv().empty:
+        if not loader.load_csv() :
             return jsonify({
                 'error' : 'Failed to load data'
             }),500
-        if not loader.load_csv():
-            return jsonify({
-                'error': 'file not loaded'
-            }),500  
+        
         #Step 2 : Clean CSV file Data
         df = loader.get_dataframe()
         cleaner = DataCleaner(df)

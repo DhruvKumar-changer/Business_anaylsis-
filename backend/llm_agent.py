@@ -2,6 +2,7 @@
 import os 
 from groq import Groq
 from dotenv import load_dotenv
+import json
 
 class LLMAgent:
     def __init__(self):
@@ -68,45 +69,45 @@ class LLMAgent:
         2. Use **simple, friendly language** (no jargon).
         3. Structure the report as follows:
 
-        {
-        "metrics_analysis": {
-            "metric_name": {
+        {{
+        "metrics_analysis": {{
+            "metric_name": {{
             "value": number,
             "status": "Good / Average / Poor",
             "meaning": "Short simple explanation of this metric",
             "reason": "Why it is in this condition",
             "proof": "Data-based justification (like trends, ratios, etc.)",
             "suggestion": "How to improve or maintain this metric"
-            },
+            }},
             ...
-        },
+        }},
 
-        "summary": {
+        "summary": {{
             "business_health": "Brief summary of how the business is performing overall",
             "key_strengths": ["List of top performing areas"],
             "key_weaknesses": ["List of weak areas that need attention"]
-        },
+        }},
 
-        "alerts": {
+        "alerts":{{
             "financial_alerts": ["Any major cost, loss or declining trend warnings"],
             "growth_alerts": ["Any risk to future scalability or market share"]
-        },
+        }},
 
-        "what_is_going_well": {
+        "what_is_going_well": {{
             "positive_trends": ["Metrics or patterns that show success"],
             "recommend_to_continue": ["Practices that should be continued or scaled"]
-        },
+        }},
 
-        "future_advice": {
+        "future_advice": {{
             "short_term": ["Immediate next 3 months actions"],
             "long_term": ["6-12 month business strategy improvements"]
-        },
+        }},
 
-        "conclusion": {
+        "conclusion": {{
             "final_assessment": "1 paragraph summarizing the overall condition, growth stage, and future readiness of the business",
             "confidence_score": "0-100 (how healthy the business seems overall)"
-        }
-        }
+        }}
+        }}
 
         4. Use the KPI values below to generate your analysis:
         {business_info}

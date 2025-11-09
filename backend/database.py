@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import Error 
 import json 
 from datetime import datetime
+import numpy as np 
 
 #Database class that interact with the database
 class BusinessDatabase:
@@ -9,12 +10,12 @@ class BusinessDatabase:
         #database credentials that is used for the connection
         self.host = "localhost" #change after render or deploy
         self.user = "root"
-        self.password = "dhruv8872"
+        self.password = "dhruv"
         self.database = "business_analyzer_db"  #mysql database name 
         #initally server is not connected 
         self.connection = None
     
-    #1.Enstablish the connection of Mysql
+    #1.Establish the connection of Mysql
     def connect(self):
         #mysql.connector.connect helps to create the link that connect the Mqsql 
         try:
@@ -118,6 +119,20 @@ class BusinessDatabase:
 
     def insert_analysis(self, business_id, kpis):
         cursor = self.connection.cursor()
+        # Recursive cleaner for numpy values inside dict/list
+        def clean_numpy(obj):
+            if isinstance(obj, dict):
+                return {k: clean_numpy(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [clean_numpy(v) for v in obj]
+            elif isinstance(obj, (np.int64, np.int32)):
+                return int(obj)
+            elif isinstance(obj, (np.float64, np.float32)):
+                return float(obj)
+            else:
+                return obj
+            # Clean full KPI dict
+        kpis_cleaned = clean_numpy(kpis)
         #important kpi store in separate columns for fast query
         query = """
         INSERT INTO analyses(
@@ -136,18 +151,19 @@ class BusinessDatabase:
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         values = (
-            business_id,
-            kpis.get('total_revenue'),
-            kpis.get('total_costs'),
-            kpis.get('net_profit'),
-            kpis.get('profit_margin'),
-            kpis.get('ebitda'),
-            kpis.get('burn_rate'),
-            kpis.get('scalability_score'),
-            kpis.get('risk_score'),
-            kpis.get('ipo_readiness'),
-            kpis.get('shark_tank_score'),
-            json.dumps(kpis)
+            int(business_id),
+            float(kpis_cleaned.get('total_revenue', 0)),
+            float(kpis_cleaned.get('total_costs', 0)),
+            float(kpis_cleaned.get('net_profit', 0)),
+            float(kpis_cleaned.get('profit_margin', 0)),
+            float(kpis_cleaned.get('ebitda', 0)),
+            float(kpis_cleaned.get('burn_rate', 0)),
+            int(kpis_cleaned.get('scalability_score', 0)),
+            int(kpis_cleaned.get('risk_score', 0)),
+            int(kpis_cleaned.get('ipo_readiness', 0)),
+            int(kpis_cleaned.get('shark_tank_score', 0)),
+            json.dumps(kpis_cleaned)
+
         )
         cursor.execute(query, values)
         self.connection.commit()
@@ -235,6 +251,17 @@ class BusinessDatabase:
             prediction['predicted_values']= json.loads(prediction['predicted_values'])
         cursor.close()
         return prediction
+
+    def get_latest_business_id(self):
+        cursor = self.connection.cursor()
+        query = "SELECT id FROM businesses ORDER BY created_at DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+            return result[0]
+        else:
+            return None
 
 
     def close(self):
