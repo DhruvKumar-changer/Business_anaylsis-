@@ -432,7 +432,7 @@
 
         // Form submission
         document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
@@ -460,11 +460,14 @@
             };
 
             try {
+                console.log('🚀 Starting submission...');
+                
                 // Step 1: Upload file
                 const fileFormData = new FormData();
                 const file = formData.get('data_file');
                 fileFormData.append('file', file);
 
+                submitBtn.textContent = '⏳ Uploading file...';
                 const uploadResponse = await fetch('http://localhost:5000/upload', {
                     method: 'POST',
                     body: fileFormData
@@ -472,10 +475,10 @@
 
                 if (!uploadResponse.ok) throw new Error('File upload failed');
                 const uploadData = await uploadResponse.json();
+                console.log('✅ File uploaded:', uploadData.filename);
                 
-                submitBtn.textContent = '⏳ Creating profile...';
-
                 // Step 2: Submit profile
+                submitBtn.textContent = '⏳ Creating profile...';
                 const profileResponse = await fetch('http://localhost:5000/submit-profile', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -484,10 +487,10 @@
 
                 if (!profileResponse.ok) throw new Error('Profile creation failed');
                 const profileData = await profileResponse.json();
-
-                submitBtn.textContent = '⏳ Analyzing...';
+                console.log('✅ Profile created:', profileData.business_id);
 
                 // Step 3: Analyze business
+                submitBtn.textContent = '⏳ Analyzing...';
                 const analyzeResponse = await fetch('http://localhost:5000/analyze', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -496,23 +499,37 @@
 
                 if (!analyzeResponse.ok) throw new Error('Analysis failed');
                 const analyzeData = await analyzeResponse.json();
+                console.log('✅ Analysis complete:', analyzeData);
 
-                // Save to sessionStorage and redirect
-                sessionStorage.setItem('businessData', JSON.stringify({
+                // Step 4: Save to sessionStorage
+                const savedData = {
                     business_id: profileData.business_id,
                     profile: profileData.profile,
                     kpis: analyzeData.kpis,
                     filename: uploadData.filename
-                }));
+                };
 
-                window.location.href = 'loading.html';
+                console.log('💾 Saving to session:', savedData);
+                sessionStorage.setItem('businessData', JSON.stringify(savedData));
+                
+                // Verify save
+                const verify = sessionStorage.getItem('businessData');
+                console.log('✅ Verified saved data:', verify ? 'SUCCESS' : 'FAILED');
+
+                // Step 5: Redirect
+                submitBtn.textContent = '✅ Complete! Redirecting...';
+                
+                setTimeout(() => {
+                    window.location.href = 'loading.html';
+                }, 500);
 
             } catch (error) {
+                console.error('❌ Error:', error);
                 alert('Error: ' + error.message);
                 submitBtn.disabled = false;
                 submitBtn.textContent = '🚀 Analyze My Business';
             }
-        });
+        }, {once: true});  // <-- IMPORTANT: 'once: true' prevents duplicate submissions
     </script>
 </body>
 </html>

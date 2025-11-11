@@ -259,94 +259,46 @@
     </div>
 
     <script>
-        // Create floating particles
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.width = Math.random() * 5 + 2 + 'px';
-            particle.style.height = particle.style.width;
-            particle.style.animationDelay = Math.random() * 6 + 's';
-            particle.style.animationDuration = Math.random() * 4 + 4 + 's';
-            particlesContainer.appendChild(particle);
+        console.log('🎬 Loading page started');
+        
+        // Get data
+        const businessData = JSON.parse(sessionStorage.getItem('businessData'));
+        if (!businessData) {
+            alert('No data found!');
+            window.location.href = 'index.html';
         }
 
-        // Fun facts to display
-        const funFacts = [
-            "Businesses that track KPIs are 2.5x more likely to achieve their goals!",
-            "Data-driven companies are 23 times more likely to acquire customers.",
-            "AI can process 1000s of data points in seconds - what took hours manually!",
-            "Companies using predictive analytics see 73% higher profits.",
-            "Good financial analysis can increase business value by up to 30%."
-        ];
+        // Simple animation
+        setTimeout(() => document.getElementById('step1').classList.add('completed'), 500);
+        setTimeout(() => document.getElementById('step2').classList.add('completed'), 1000);
+        setTimeout(() => document.getElementById('step3').classList.add('completed'), 1500);
+        setTimeout(() => document.getElementById('step4').classList.add('completed'), 2000);
 
-        // Display random fun fact
-        document.getElementById('funFact').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
-
-        // Status messages
-        const statusMessages = [
-            "Initializing analysis engine...",
-            "Loading your business data...",
-            "Calculating financial metrics...",
-            "Running ML predictions...",
-            "Generating AI insights...",
-            "Preparing your dashboard..."
-        ];
-
-        let currentStatus = 0;
-        const statusText = document.getElementById('statusText');
-
-        // Update status text
-        const statusInterval = setInterval(() => {
-            if (currentStatus < statusMessages.length) {
-                statusText.textContent = statusMessages[currentStatus];
-                currentStatus++;
-            }
-        }, 500);
-
-        // Complete steps sequentially
-        setTimeout(() => document.getElementById('step1').classList.add('completed'), 800);
-        setTimeout(() => document.getElementById('step2').classList.add('completed'), 1400);
-        setTimeout(() => document.getElementById('step3').classList.add('completed'), 2000);
-        setTimeout(() => document.getElementById('step4').classList.add('completed'), 2600);
-
-        // Fetch recommendations and redirect to dashboard
-        setTimeout(async () => {
+        // Fetch data function
+        async function fetchData() {
+            console.log('📡 Fetching additional data...');
+            
+            // Recommendations
             try {
-                statusText.textContent = "Generating AI recommendations...";
-                
-                // Get stored data
-                const businessData = JSON.parse(sessionStorage.getItem('businessData'));
-                
-                if (!businessData) {
-                    throw new Error('Business data not found');
-                }
-
-                // Get recommendations
-                const recResponse = await fetch('http://localhost:5000/recommendations', {
+                const res = await fetch('http://localhost:5000/recommendations', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({kpis: businessData.kpis})
+                    body: JSON.stringify({kpis: businessData.kpis, profile: businessData.profile})
                 });
-
-                if (!recResponse.ok) throw new Error('Failed to get recommendations');
-                const recData = await recResponse.json();
-
-                // Get predictions
-                const predResponse = await fetch('http://localhost:5000/predict', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({filename: businessData.filename})
-                });
-
-                let predData = null;
-                if (predResponse.ok) {
-                    predData = await predResponse.json();
+                if (res.ok) {
+                    const data = await res.json();
+                    businessData.recommendations = data.recommendations;
+                    console.log('✅ Recommendations loaded');
+                } else {
+                    console.log('❌ Recommendations failed:', await res.text());
                 }
+            } catch (e) {
+                console.log('❌ Recommendations error:', e);
+            }
 
-                // Get charts
-                const chartsResponse = await fetch('http://localhost:5000/charts', {
+            // Charts
+            try {
+                const res = await fetch('http://localhost:5000/charts', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -354,32 +306,39 @@
                         chart_types: ['revenue_trend', 'product_comparison', 'expense_breakdown', 'forecast']
                     })
                 });
-
-                let chartsData = null;
-                if (chartsResponse.ok) {
-                    chartsData = await chartsResponse.json();
+                if (res.ok) {
+                    const data = await res.json();
+                    businessData.charts = data.charts;
+                    console.log('✅ Charts loaded');
+                } else {
+                    console.log('❌ Charts failed:', await res.text());
                 }
-
-                // Save all data
-                businessData.recommendations = recData.recommendations;
-                businessData.predictions = predData;
-                businessData.charts = chartsData?.charts;
-                sessionStorage.setItem('businessData', JSON.stringify(businessData));
-
-                statusText.textContent = "✅ Analysis complete! Redirecting...";
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-
-            } catch (error) {
-                console.error('Error:', error);
-                statusText.textContent = "⚠️ Error loading data. Redirecting anyway...";
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
+            } catch (e) {
+                console.log('❌ Charts error:', e);
             }
-        }, 3000);
-    </script>
-</body>
-</html>
+            // Predictions (ADD IF MISSING)
+        try {
+            const res = await fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({filename: businessData.filename})
+            });
+            if (res.ok) {
+                const data = await res.json();
+                businessData.predictions = data;
+                console.log('✅ Predictions loaded');
+            }
+        } catch (e) {
+            console.log('❌ Predictions error:', e);
+        }
+
+            // Save and redirect
+            sessionStorage.setItem('businessData', JSON.stringify(businessData));
+            console.log('💾 Data saved, redirecting...');
+            
+            window.location.href = 'dashboard.html';
+        }
+
+    // Start after 3 seconds (ONLY ONCE)
+    setTimeout(fetchData, 3000);
+</script>
