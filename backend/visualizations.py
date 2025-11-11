@@ -190,42 +190,51 @@ class ChartGenerator:
         except Exception as e:
             print(f"❌ Error creating expense breakdown chart: {e}")
             return None
-    
-    def forecast_chart(self, historical_data, predictions, labels=None):
-        """
-        Create forecast chart showing historical data and predictions
         
-        Args:
-            historical_data (list/array): Historical values
-            predictions (list/array): Predicted values
-            labels (list): Labels for x-axis (optional)
-            
-        Returns:
-            str: Base64 encoded chart image
-        """
+    def forecast_chart(self, historical_data, predictions, labels=None):
         try:
+            print(f"📊 Forecast chart - Historical: {len(historical_data)}, Predictions: {len(predictions) if predictions else 0}")
+            
             fig, ax = plt.subplots(figsize=(14, 7))
             
+            # Convert to lists
+            historical_data = list(historical_data) if not isinstance(historical_data, list) else historical_data
+            
+            if predictions:
+                predictions = list(predictions) if not isinstance(predictions, list) else predictions
+            else:
+                predictions = []
+                print("⚠️ No predictions provided, showing only historical data")
+            
+            if len(historical_data) == 0:
+                print("⚠️ No historical data")
+                return None
+            
             # Historical data
-            hist_x = range(len(historical_data))
+            hist_x = list(range(len(historical_data)))
             ax.plot(hist_x, historical_data, 
-                   marker='o', linewidth=2, markersize=8, 
-                   color=self.colors[0], label='Historical Data')
+                marker='o', linewidth=2, markersize=8, 
+                color=self.colors[0], label='Historical Data')
             
-            # Predictions
-            pred_x = range(len(historical_data), len(historical_data) + len(predictions))
-            ax.plot(pred_x, predictions, 
-                   marker='s', linewidth=2, markersize=8, linestyle='--',
-                   color=self.colors[1], label='Forecast')
-            
-            # Connection line between historical and forecast
-            ax.plot([hist_x[-1], pred_x[0]], 
-                   [historical_data[-1], predictions[0]], 
-                   linestyle=':', color='gray', linewidth=1.5)
-            
-            # Shaded forecast area
-            ax.axvspan(len(historical_data)-0.5, len(historical_data)+len(predictions), 
-                      alpha=0.1, color=self.colors[1])
+            # Predictions (only if available)
+            if len(predictions) > 0:
+                pred_x = list(range(len(historical_data), len(historical_data) + len(predictions)))
+                ax.plot(pred_x, predictions, 
+                    marker='s', linewidth=2, markersize=8, linestyle='--',
+                    color=self.colors[1], label='Forecast')
+                
+                # Connection line
+                ax.plot([hist_x[-1], pred_x[0]], 
+                    [historical_data[-1], predictions[0]], 
+                    linestyle=':', color='gray', linewidth=1.5)
+                
+                # Shaded forecast area
+                ax.axvspan(len(historical_data)-0.5, len(historical_data)+len(predictions), 
+                        alpha=0.1, color=self.colors[1])
+                
+                # Vertical separator line
+                ax.axvline(x=len(historical_data)-0.5, color='red', 
+                        linestyle='--', linewidth=2, alpha=0.5)
             
             # Styling
             ax.set_title('Sales Forecast', fontsize=16, fontweight='bold', pad=20)
@@ -235,10 +244,6 @@ class ChartGenerator:
             ax.grid(True, alpha=0.3)
             ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'₹{x:,.0f}'))
             
-            # Add vertical line separating historical and forecast
-            ax.axvline(x=len(historical_data)-0.5, color='red', 
-                      linestyle='--', linewidth=2, alpha=0.5)
-            
             plt.tight_layout()
             
             print("✅ Forecast chart created")
@@ -246,8 +251,10 @@ class ChartGenerator:
         
         except Exception as e:
             print(f"❌ Error creating forecast chart: {e}")
+            import traceback
+            traceback.print_exc()
             return None
-    
+        
     def kpi_dashboard_chart(self, kpis):
         """
         Create KPI summary dashboard
