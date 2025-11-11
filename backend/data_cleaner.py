@@ -34,7 +34,7 @@ class DataCleaner:
     #format the date column in the datetime format
     def format_dates(self):
         if "Date" in self.df.columns:
-            self.df["Date"] = pd.to_datetime(self.df["Date"], error="coerce")
+            self.df["Date"] = pd.to_datetime(self.df["Date"], errors="coerce")
             print("Date formated")
         else:
             print("no dates found")
@@ -54,7 +54,11 @@ class DataCleaner:
         self.remove_duplicates()
         self.format_dates()
         return self.df
+    # Return the cleaned DataFrame
+    def get_dataframe(self):
+        return self.df
 
-#creating the object 
+
+# #creating the object 
 # cleaner = DataCleaner("self.df")
 # cleaner_df = cleaner.clean_all()

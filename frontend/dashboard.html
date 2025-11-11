@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Analysis Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .top-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .business-info {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            padding: 18px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .nav-item:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .section-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid #667eea;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .card-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .card-change {
+            font-size: 0.9em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .card-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .card-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* KPI Boxes */
+        .kpi-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid #667eea;
+        }
+
+        .kpi-box:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .kpi-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .kpi-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .kpi-description {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .chart-image {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        /* Recommendations */
+        .recommendation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid #27ae60;
+        }
+
+        .recommendation-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+        .badge-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Predictions */
+        .prediction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .prediction-period {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .prediction-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        /* Alert Box */
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <h1 id="businessName">Business Dashboard</h1>
+        <div class="business-info" id="businessInfo">Loading...</div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-item active" onclick="showSection('overview')">📊 Overview</div>
+        <div class="nav-item" onclick="showSection('kpis')">💰 KPIs Detail</div>
+        <div class="nav-item" onclick="showSection('charts')">📈 Charts & Trends</div>
+        <div class="nav-item" onclick="showSection('predictions')">🔮 Predictions</div>
+        <div class="nav-item" onclick="showSection('recommendations')">💡 Recommendations</div>
+        <div class="nav-item" onclick="showSection('report')">📜 Full Report</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- SECTION 1: Overview -->
+        <div id="overview" class="section active">
+            <h2 class="section-title">📊 Business Overview</h2>
+            <p class="section-subtitle">Key metrics at a glance</p>
+
+            <div class="cards-grid" id="overviewCards">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading data...</p>
+                </div>
+            </div>
+
+            <div id="overviewAlerts"></div>
+        </div>
+
+        <!-- SECTION 2: KPIs Detail -->
+        <div id="kpis" class="section">
+            <h2 class="section-title">💰 Detailed KPIs</h2>
+            <p class="section-subtitle">All business metrics in detail</p>
+
+            <div id="kpisContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading KPIs...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: Charts & Trends -->
+        <div id="charts" class="section">
+            <h2 class="section-title">📈 Visual Analytics</h2>
+            <p class="section-subtitle">Charts and trends visualization</p>
+
+            <div id="chartsContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading charts...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: Predictions -->
+        <div id="predictions" class="section">
+            <h2 class="section-title">🔮 Future Predictions</h2>
+            <p class="section-subtitle">ML-powered sales forecasting</p>
+
+            <div id="predictionsContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading predictions...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: Recommendations -->
+        <div id="recommendations" class="section">
+            <h2 class="section-title">💡 AI Recommendations</h2>
+            <p class="section-subtitle">Expert suggestions to improve your business</p>
+
+            <div id="recommendationsContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading recommendations...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 6: Full Report -->
+        <div id="report" class="section">
+            <h2 class="section-title">📜 Complete Analysis Report</h2>
+            <p class="section-subtitle">Comprehensive business analysis</p>
+
+            <div id="reportContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading full report...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Load data from sessionStorage
+        const businessData = JSON.parse(sessionStorage.getItem('businessData'));
+        // ADD THIS - Debug check
+        console.log('=== DASHBOARD DATA CHECK ===');
+        console.log('Has KPIs:', !!businessData?.kpis);
+        console.log('Has Recommendations:', !!businessData?.recommendations);
+        console.log('Has Predictions:', !!businessData?.predictions);
+        console.log('Has Charts:', !!businessData?.charts);
+        console.log('Full Data:', businessData);
+        console.log('===========================');
+
+        if (!businessData) {
+            alert('No data found! Redirecting to home...');
+            window.location.href = 'index.html';
+        }
+
+        // Set business info
+        document.getElementById('businessName').textContent = businessData.profile?.business_name || 'Business Dashboard';
+        document.getElementById('businessInfo').textContent = `${businessData.profile?.industry || 'Unknown'} | ${businessData.profile?.business_type || 'N/A'}`;
+
+        // Render Overview
+        function renderOverview() {
+            const kpis = businessData.kpis;
+            const html = `
+                <div class="card">
+                    <div class="card-icon">💰</div>
+                    <div class="card-label">Total Revenue</div>
+                    <div class="card-value">₹${formatNumber(kpis.total_revenue)}</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📈</div>
+                    <div class="card-label">Net Profit</div>
+                    <div class="card-value">₹${formatNumber(kpis.net_profit)}</div>
+                    <span class="card-change ${kpis.net_profit > 0 ? 'positive' : 'negative'}">
+                        ${kpis.net_profit > 0 ? '▲' : '▼'} ${kpis.profit_margin.toFixed(1)}%
+                    </span>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎯</div>
+                    <div class="card-label">Profit Margin</div>
+                    <div class="card-value">${kpis.profit_margin.toFixed(1)}%</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-label">Growth Rate</div>
+                    <div class="card-value">${kpis.revenue_growth_rate}%</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏆</div>
+                    <div class="card-label">Shark Tank Score</div>
+                    <div class="card-value">${kpis.shark_tank_score}/100</div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-label">IPO Readiness</div>
+                    <div class="card-value">${kpis.ipo_readiness}/100</div>
+                </div>
+            `;
+            document.getElementById('overviewCards').innerHTML = html;
+
+            // Add alerts
+            let alertsHtml = '';
+            if (kpis.net_profit < 0) {
+                alertsHtml += `<div class="alert alert-warning">⚠️ Your business is running in loss. Focus on reducing costs and increasing revenue.</div>`;
+            }
+            if (kpis.risk_score > 70) {
+                alertsHtml += `<div class="alert alert-warning">⚠️ High risk score detected (${kpis.risk_score}/100). Review your financial strategy.</div>`;
+            }
+            if (kpis.growth_trajectory === 'Strong Growth') {
+                alertsHtml += `<div class="alert alert-success">✅ Excellent! Your business shows strong growth trajectory.</div>`;
+            }
+            document.getElementById('overviewAlerts').innerHTML = alertsHtml;
+        }
+
+        // Render KPIs
+        function renderKPIs() {
+            const kpis = businessData.kpis;
+            let html = '';
+
+            const kpiCategories = {
+                'Basic Metrics (5)': [
+                    {name: 'Total Revenue', value: `₹${formatNumber(kpis.total_revenue)}`, desc: 'Sum of all revenue'},
+                    {name: 'Total Costs', value: `₹${formatNumber(kpis.total_cost)}`, desc: 'Sum of all expenses'},
+                    {name: 'Net Profit', value: `₹${formatNumber(kpis.net_profit)}`, desc: 'Revenue minus costs'},
+                    {name: 'Profit Margin', value: `${kpis.profit_margin.toFixed(2)}%`, desc: 'Profit as % of revenue'},
+                    {name: 'Gross Profit', value: `₹${formatNumber(kpis.gross_profit)}`, desc: 'Revenue minus direct costs'}
+                ],
+                'Advanced Financial (8)': [
+                    {name: 'EBITDA', value: `₹${formatNumber(kpis.ebitda)}`, desc: 'Earnings before interest, tax'},
+                    {name: 'Operating Profit', value: `₹${formatNumber(kpis.operating_profit)}`, desc: 'Gross profit minus operating expenses'},
+                    {name: 'Burn Rate', value: `₹${formatNumber(kpis.burn_rate)}/month`, desc: 'Monthly expense rate'},
+                    {name: 'Runway', value: `${kpis.runway_months} months`, desc: 'Months company can survive'},
+                    {name: 'Break-even Point', value: `₹${formatNumber(kpis.break_even_point)}`, desc: 'Revenue needed for zero profit'},
+                    {name: 'ROI', value: `${kpis.roi}%`, desc: 'Return on investment'},
+                    {name: 'Revenue Growth', value: `${kpis.revenue_growth_rate}%`, desc: 'Growth rate'},
+                    {name: 'Expense Ratio', value: `${kpis.expense_ratio}%`, desc: 'Expenses as % of revenue'}
+                ],
+                'Product Analysis (3)': [
+                    {name: 'Best Product', value: kpis.best_product?.product || 'N/A', desc: `Profit: ₹${formatNumber(kpis.best_product?.profit || 0)}`},
+                    {name: 'Worst Product', value: kpis.worst_product?.product || 'N/A', desc: `Profit: ₹${formatNumber(kpis.worst_product?.profit || 0)}`},
+                    {name: 'Total Products', value: Object.keys(kpis.product_wise_analysis || {}).length, desc: 'Number of products analyzed'}
+                ],
+                'Expense Breakdown (2)': [
+                    {name: 'Highest Expense', value: kpis.highest_expense?.category || 'N/A', desc: `${kpis.highest_expense?.percentage || 0}% of total`},
+                    {name: 'All Categories', value: 'View Details', desc: Object.entries(kpis.expense_breakdown || {}).map(([k,v]) => `${k}: ${v}%`).join(', ')}
+                ],
+                'Trends (4)': [
+                    {name: 'Growth Trajectory', value: kpis.growth_trajectory, desc: 'Is business growing?'},
+                    {name: 'Monthly Revenue Periods', value: Object.keys(kpis.monthly_revenue || {}).length, desc: 'Months tracked'},
+                    {name: 'Monthly Profit Periods', value: Object.keys(kpis.monthly_profit || {}).length, desc: 'Profit trend periods'},
+                    {name: 'Seasonal Quarters', value: Object.keys(kpis.seasonal_analysis || {}).length, desc: `Quarters: ${Object.keys(kpis.seasonal_analysis || {}).join(', ')}`}
+                ],
+                'Investment Readiness (5)': [
+                    {name: 'Scalability Score', value: `${kpis.scalability_score}/100`, desc: 'Can business scale?'},
+                    {name: 'Risk Score', value: `${kpis.risk_score}/100`, desc: 'Investment risk (lower is better)'},
+                    {name: 'IPO Readiness', value: `${kpis.ipo_readiness}/100`, desc: 'Ready for public offering?'},
+                    {name: 'Shark Tank Score', value: `${kpis.shark_tank_score}/100`, desc: 'Would sharks invest?'},
+                    {name: 'Expansion Recommendation', value: kpis.expansion_recommendation?.recommendation || 'N/A', desc: (kpis.expansion_recommendation?.reasons || []).join(', ')}
+                ],
+                'Additional Metrics (5)': [
+                    {name: 'Customer Acquisition Cost', value: `₹${formatNumber(kpis.customer_acquisition_cost)}`, desc: 'Cost per customer'},
+                    {name: 'Avg Revenue/Booking', value: `₹${formatNumber(kpis.avg_revenue_per_booking)}`, desc: 'Revenue per transaction'},
+                    {name: 'Operating Efficiency', value: `${kpis.operating_efficiency}%`, desc: 'How efficiently operating'},
+                    {name: 'Cash Flow Health', value: kpis.cash_flow_health, desc: 'Current cash flow status'},
+                    {name: 'Market Position', value: kpis.market_position, desc: 'Your market standing'}
+                ]
+            };
+
+    // Render by category
+    for (const [category, items] of Object.entries(kpiCategories)) {
+        html += `<h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 1.4em;">📊 ${category}</h3>`;
+        
+        items.forEach(kpi => {
+            html += `
+                <div class="kpi-box">
+                    <div class="kpi-header">
+                        <div class="kpi-name">${kpi.name}</div>
+                        <div class="kpi-value">${kpi.value}</div>
+                    </div>
+                    <div class="kpi-description">${kpi.desc}</div>
+                </div>
+            `;
+        });
+    }
+
+    // Add detailed breakdowns
+    html += `
+        <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 1.4em;">📋 Product-wise Detailed Analysis</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Revenue</th>
+                    <th>Cost</th>
+                    <th>Profit</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Product-wise table
+    Object.entries(kpis.product_wise_analysis || {}).forEach(([product, data]) => {
+        html += `
+            <tr>
+                <td>${product}</td>
+                <td>₹${formatNumber(data.revenue)}</td>
+                <td>₹${formatNumber(data.cost)}</td>
+                <td style="color: ${data.profit > 0 ? '#27ae60' : '#e74c3c'}; font-weight: bold;">₹${formatNumber(data.profit)}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('kpisContainer').innerHTML = html;
+    }
+
+        // Render Charts
+        function renderCharts() {
+            console.log('📊 Rendering charts...');
+            const charts = businessData.charts;
+            if (!charts) {
+                console.log('❌ No charts data');
+                document.getElementById('chartsContainer').innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Charts not available</strong><br>
+                        Chart generation failed on backend.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            if (charts.revenue_trend) {
+                html += `
+                    <div class="chart-container">
+                        <div class="chart-title">📈 Revenue Trend Over Time</div>
+                        <img src="data:image/png;base64,${charts.revenue_trend}" class="chart-image">
+                    </div>
+                `;
+            }
+            if (charts.product_comparison) {
+                html += `
+                    <div class="chart-container">
+                        <div class="chart-title">🏆 Product-wise Revenue Comparison</div>
+                        <img src="data:image/png;base64,${charts.product_comparison}" class="chart-image">
+                    </div>
+                `;
+            }
+            if (charts.expense_breakdown) {
+                html += `
+                    <div class="chart-container">
+                        <div class="chart-title">💸 Expense Breakdown</div>
+                        <img src="data:image/png;base64,${charts.expense_breakdown}" class="chart-image">
+                    </div>
+                `;
+            }
+            if (charts.forecast) {
+                html += `
+                    <div class="chart-container">
+                        <div class="chart-title">🔮 Sales Forecast</div>
+                        <img src="data:image/png;base64,${charts.forecast}" class="chart-image">
+                    </div>
+                `;
+            }
+                    // Inside renderCharts function, charts ke baad add karo:
+            if (!charts || Object.keys(charts).length === 0) {
+            html = `
+                <div class="alert alert-warning">
+                    <strong>⚠️ Charts not available</strong><br>
+                    Charts generation failed. This might be due to:
+                    <ul>
+                        <li>Insufficient data points</li>
+                        <li>Backend processing error</li>
+                    </ul>
+                    <p>Your KPIs and recommendations are still available in other sections.</p>
+                </div>
+                `;
+            }
+
+            document.getElementById('chartsContainer').innerHTML = html;
+        }
+
+        // Render Predictions
+        function renderPredictions() {
+            console.log('🔮 Rendering predictions...');
+            const pred = businessData.predictions;
+            console.log('Predictions data:', pred);
+
+           if (!pred || !pred.future_predictions) {
+                console.log('❌ No predictions data');
+                document.getElementById('predictionsContainer').innerHTML = `
+                    <div class="alert alert-warning">
+                    <strong>⚠️ Predictions not available</strong><br>
+                    ML model training requires more data or model file is missing.
+                </div>
+            `;
+            return;
+        }
+
+            let html = `
+                <div class="alert alert-info">
+                    <strong>Model Used:</strong> ${pred.model_name}<br>
+                    <strong>Accuracy:</strong> ${(pred.model_accuracy * 100).toFixed(1)}%
+                </div>
+                <div class="prediction-list">
+            `;
+
+            pred.future_predictions.forEach((value, index) => {
+                html += `
+                    <div class="prediction-item">
+                        <span class="prediction-period">Period ${index + 1}</span>
+                        <span class="prediction-value">₹${formatNumber(value)}</span>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            document.getElementById('predictionsContainer').innerHTML = html;
+        }
+
+        // Render Recommendations
+        // REPLACE पूरा renderRecommendations() function इससे (dashboard.html में):
+
+        function renderRecommendations() {
+            console.log('💡 Rendering recommendations...');
+            const rec = businessData.recommendations;
+            
+            console.log('Recommendations type:', typeof rec);
+            console.log('Recommendations length:', rec?.length);
+            console.log('Raw recommendations:', rec);
+            
+            if (!rec) {
+                document.getElementById('recommendationsContainer').innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Recommendations not available</strong><br>
+                        LLM failed to generate recommendations.
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                // Parse JSON if it's a string
+                let data;
+                if (typeof rec === 'string') {
+                    console.log('🔄 Parsing JSON string...');
+                    data = JSON.parse(rec);
+                } else {
+                    data = rec;
+                }
+                
+                console.log('✅ Parsed data:', data);
+                
+                let html = '';
+
+                // ===== EXECUTIVE SUMMARY =====
+                if (data.executive_summary) {
+                    html += `
+                        <div class="recommendation-card" style="border-left-color: #3498db;">
+                            <div class="recommendation-title">📋 Executive Summary</div>
+                            <div class="recommendation-text"><strong>Stage:</strong> ${data.executive_summary.business_stage || 'N/A'}</div>
+                            <div class="recommendation-text"><strong>Overview:</strong> ${data.executive_summary.overview || 'N/A'}</div>
+                            <div class="recommendation-text"><strong>Health Score:</strong> ${data.executive_summary.confidence_score || 'N/A'}/100</div>
+                        </div>
+                    `;
+                }
+
+                // ===== SUMMARY =====
+                if (data.summary) {
+                    html += `
+                        <div class="recommendation-card">
+                            <div class="recommendation-title">📊 Business Health</div>
+                            <div class="recommendation-text">${data.summary.business_health || 'N/A'}</div>
+                        </div>
+                    `;
+
+                    // Key Strengths
+                    if (data.summary.key_strengths && data.summary.key_strengths.length > 0) {
+                        html += `
+                            <div class="recommendation-card" style="border-left-color: #27ae60;">
+                                <div class="recommendation-title">💪 Key Strengths</div>
+                                ${data.summary.key_strengths.map(s => `<div class="recommendation-text">✅ ${s}</div>`).join('')}
+                            </div>
+                        `;
+                    }
+
+                    // Key Weaknesses
+                    if (data.summary.key_weaknesses && data.summary.key_weaknesses.length > 0) {
+                        html += `
+                            <div class="recommendation-card" style="border-left-color: #e74c3c;">
+                                <div class="recommendation-title">⚠️ Areas to Improve</div>
+                                ${data.summary.key_weaknesses.map(w => `<div class="recommendation-text">❌ ${w}</div>`).join('')}
+                            </div>
+                        `;
+                    }
+                }
+
+                // ===== METRIC DIAGNOSTICS =====
+                if (data.metric_diagnostics) {
+                    // Financial Performance
+                    if (data.metric_diagnostics.financial_performance && data.metric_diagnostics.financial_performance.length > 0) {
+                        html += `
+                            <div class="recommendation-card" style="border-left-color: #f39c12;">
+                                <div class="recommendation-title">💰 Financial Performance Analysis</div>
+                        `;
+                        data.metric_diagnostics.financial_performance.forEach(metric => {
+                            html += `
+                                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                                    <strong>${metric.metric}</strong> 
+                                    <span style="float: right; background: ${getStatusColor(metric.assessment)}; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">
+                                        ${metric.assessment}
+                                    </span>
+                                    <div style="margin-top: 5px; font-size: 0.9em; color: #555;">
+                                        <strong>Value:</strong> ${metric.value}<br>
+                                        <strong>Analysis:</strong> ${metric.analysis}<br>
+                                        <strong>Impact:</strong> ${metric.impact}<br>
+                                        <strong>Improvement Plan:</strong> ${metric.improvement_plan}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+
+                    // Operational Efficiency
+                    if (data.metric_diagnostics.operational_efficiency && data.metric_diagnostics.operational_efficiency.length > 0) {
+                        html += `
+                            <div class="recommendation-card" style="border-left-color: #9b59b6;">
+                                <div class="recommendation-title">⚙️ Operational Efficiency</div>
+                        `;
+                        data.metric_diagnostics.operational_efficiency.forEach(metric => {
+                            html += `
+                                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                                    <strong>${metric.metric}</strong> 
+                                    <span style="float: right; background: ${getStatusColor(metric.assessment)}; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">
+                                        ${metric.assessment}
+                                    </span>
+                                    <div style="margin-top: 5px; font-size: 0.9em; color: #555;">
+                                        <strong>Value:</strong> ${metric.value}<br>
+                                        <strong>Analysis:</strong> ${metric.analysis}<br>
+                                        <strong>Impact:</strong> ${metric.impact}<br>
+                                        <strong>Recommendation:</strong> ${metric.recommendation}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+                }
+
+                // ===== STRATEGIC RECOMMENDATIONS =====
+                if (data.strategic_recommendations) {
+                    html += `
+                        <div class="recommendation-card" style="border-left-color: #1abc9c;">
+                            <div class="recommendation-title">🎯 Strategic Recommendations</div>
+                    `;
+
+                    if (data.strategic_recommendations.short_term && data.strategic_recommendations.short_term.length > 0) {
+                        html += `<strong style="display: block; margin-top: 10px;">📅 Short-term Actions (3-6 months):</strong>`;
+                        data.strategic_recommendations.short_term.forEach((action, i) => {
+                            html += `<div class="recommendation-text">${i + 1}. ${action}</div>`;
+                        });
+                    }
+
+                    if (data.strategic_recommendations.mid_term && data.strategic_recommendations.mid_term.length > 0) {
+                        html += `<strong style="display: block; margin-top: 15px;">📊 Mid-term Strategies (6-12 months):</strong>`;
+                        data.strategic_recommendations.mid_term.forEach((action, i) => {
+                            html += `<div class="recommendation-text">${i + 1}. ${action}</div>`;
+                        });
+                    }
+
+                    if (data.strategic_recommendations.long_term && data.strategic_recommendations.long_term.length > 0) {
+                        html += `<strong style="display: block; margin-top: 15px;">🚀 Long-term Plan (12+ months):</strong>`;
+                        data.strategic_recommendations.long_term.forEach((action, i) => {
+                            html += `<div class="recommendation-text">${i + 1}. ${action}</div>`;
+                        });
+                    }
+
+                    html += `</div>`;
+                }
+
+                // ===== ALERTS & RISKS =====
+                if (data.alerts_and_risks) {
+                    if (data.alerts_and_risks.financial_alerts && data.alerts_and_risks.financial_alerts.length > 0) {
+                        html += `
+                            <div class="alert alert-warning">
+                                <strong>🚨 Financial Alerts</strong><br>
+                                ${data.alerts_and_risks.financial_alerts.map(a => `• ${a}`).join('<br>')}
+                            </div>
+                        `;
+                    }
+
+                    if (data.alerts_and_risks.growth_alerts && data.alerts_and_risks.growth_alerts.length > 0) {
+                        html += `
+                            <div class="alert alert-warning">
+                                <strong>📉 Growth Risks</strong><br>
+                                ${data.alerts_and_risks.growth_alerts.map(a => `• ${a}`).join('<br>')}
+                            </div>
+                        `;
+                    }
+
+                    if (data.alerts_and_risks.operational_risks && data.alerts_and_risks.operational_risks.length > 0) {
+                        html += `
+                            <div class="alert alert-warning">
+                                <strong>⚙️ Operational Risks</strong><br>
+                                ${data.alerts_and_risks.operational_risks.map(a => `• ${a}`).join('<br>')}
+                            </div>
+                        `;
+                    }
+                }
+
+                // ===== CONCLUSION =====
+                if (data.conclusion) {
+                    html += `
+                        <div class="recommendation-card" style="border-left-color: #2ecc71;">
+                            <div class="recommendation-title">📌 Final Diagnosis & Action Items</div>
+                            <div class="recommendation-text"><strong>Overall Assessment:</strong></div>
+                            <div class="recommendation-text">${data.conclusion.final_diagnosis || 'N/A'}</div>
+                            
+                            ${data.conclusion.priority_focus_areas ? `
+                                <strong style="display: block; margin-top: 15px;">🎯 Priority Focus Areas:</strong>
+                                ${data.conclusion.priority_focus_areas.map(a => `<div class="recommendation-text">• ${a}</div>`).join('')}
+                            ` : ''}
+                            
+                            ${data.conclusion.positive_highlights ? `
+                                <strong style="display: block; margin-top: 15px;">⭐ Positive Highlights:</strong>
+                                ${data.conclusion.positive_highlights.map(h => `<div class="recommendation-text">✓ ${h}</div>`).join('')}
+                            ` : ''}
+                        </div>
+                    `;
+                }
+
+                // If no sections were rendered, show raw data
+                if (html === '') {
+                    html = `
+                        <div class="recommendation-card">
+                            <div class="recommendation-title">📊 Raw Recommendations Data</div>
+                            <pre style="white-space: pre-wrap; font-family: monospace; font-size: 0.9em; max-height: 400px; overflow-y: auto;">
+${JSON.stringify(data, null, 2)}
+                            </pre>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('recommendationsContainer').innerHTML = html;
+                
+            } catch (e) {
+                console.error('❌ Recommendations parse error:', e);
+                document.getElementById('recommendationsContainer').innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Error displaying recommendations</strong><br>
+                        Error: ${e.message}
+                        <br><br>
+                        <strong>Raw Data:</strong>
+                        <pre style="white-space: pre-wrap; font-size: 0.85em; max-height: 300px; overflow-y: auto;">
+${typeof rec === 'string' ? rec.substring(0, 500) : JSON.stringify(rec, null, 2)}
+                        </pre>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper function to get status color
+        function getStatusColor(status) {
+            if (!status) return '#95a5a6';
+            status = status.toLowerCase();
+            if (status.includes('excellent') || status.includes('good') || status.includes('strong')) return '#27ae60';
+            if (status.includes('weak') || status.includes('poor') || status.includes('critical')) return '#e74c3c';
+            if (status.includes('sustainable')) return '#3498db';
+            if (status.includes('high') || status.includes('warning')) return '#f39c12';
+            return '#95a5a6';
+        }
+        
+        // Render Full Report
+        
+        function renderReport() {
+            const kpis = businessData.kpis;
+            const html = `
+                <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h3>Complete Business Analysis</h3>
+                        <button onclick="downloadPDF()" id="downloadBtn" style="
+                            padding: 12px 30px;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-size: 1em;
+                            font-weight: 600;
+                            cursor: pointer;
+                        ">📄 Download PDF Report</button>
+                    </div>
+                    
+                    <div class="alert alert-info" style="margin-bottom: 20px;">
+                        <strong>💡 Tip:</strong> Download the PDF for a professionally formatted report you can share with investors or team members.
+                    </div>
+                    
+                    <h4 style="margin-top: 30px;">Raw Data Preview:</h4>
+                    <pre style="
+                        white-space: pre-wrap; 
+                        font-family: monospace; 
+                        line-height: 1.6;
+                        background: #f8f9fa;
+                        padding: 20px;
+                        border-radius: 8px;
+                        max-height: 400px;
+                        overflow-y: auto;
+                    ">${JSON.stringify(kpis, null, 2)}</pre>
+                </div>
+            `;
+            document.getElementById('reportContainer').innerHTML = html;
+        }
+
+        // Download PDF Report
+        function downloadPDF() {
+            console.log('📥 Starting PDF download...');
+            const btn = document.getElementById('downloadBtn');
+            if (btn) btn.textContent = '⏳ Generating PDF...';
+            
+            const payload = {
+                kpis: businessData.kpis,
+                profile: businessData.profile,
+                recommendations: businessData.recommendations
+            };
+            
+            console.log('📦 Payload being sent:', payload);
+            
+            fetch('http://localhost:5000/generate-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/pdf'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                console.log('📊 Response status:', response.status);
+                console.log('📊 Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return response.blob();
+            })
+            .then(blob => {
+                console.log('✅ PDF blob received, size:', blob.size, 'bytes');
+                
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Business_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                
+                console.log('📥 Starting download:', link.download);
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Cleanup
+                window.URL.revokeObjectURL(url);
+                
+                console.log('✅ PDF downloaded successfully');
+                
+                if (btn) btn.textContent = '📄 Download PDF Report';
+            })
+            .catch(error => {
+                console.error('❌ PDF Error:', error);
+                alert('❌ Error generating PDF:\n' + error.message + '\n\nCheck terminal for details');
+                if (btn) btn.textContent = '📄 Download PDF Report';
+            });
+        }
+
+
+        // Utility function
+        function formatNumber(num) {
+            if (num >= 10000000) return (num / 10000000).toFixed(2) + ' Cr';
+            if (num >= 100000) return (num / 100000).toFixed(2) + ' L';
+            return num.toLocaleString('en-IN');
+        }
+
+        // Initialize
+        renderOverview();
+        renderKPIs();
+        renderCharts();
+        renderPredictions();
+        renderRecommendations();
+        renderReport();
+    </script>
+</body>
+</html>

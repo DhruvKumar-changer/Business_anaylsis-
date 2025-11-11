@@ -2,15 +2,48 @@
 import os 
 from groq import Groq
 from dotenv import load_dotenv
+import json
 
 class LLMAgent:
     def __init__(self):
         load_dotenv()
-        self.client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+        self.client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
 
-    def generate_recommendations(self , kpis):
+    # Updated llm_agent.py - generate_recommendations function
+
+    def generate_recommendations(self, kpis, business_profile=None):
+        """
+        Generate recommendations with business profile context
+        
+        Args:
+            kpis (dict): KPI metrics
+            business_profile (dict, optional): Business profile from entry questions
+        """
+        
+        # Build business context if profile provided
+        profile_context = ""
+        if business_profile:
+            profile_context = f"""
+            
+            📋 BUSINESS PROFILE CONTEXT:
+            • Business Name: {business_profile.get('business_name', 'N/A')}
+            • Industry: {business_profile.get('industry', 'N/A')}
+            • Business Type: {business_profile.get('business_type', 'N/A')}
+            • Primary Goal: {business_profile.get('primary_goal', 'N/A')}
+            • Seeking Funding: {business_profile.get('seeking_funding', 'N/A')}
+            • Monthly Revenue Range: {business_profile.get('monthly_revenue', 'N/A')}
+            • Top Concerns: {', '.join(business_profile.get('concerns', []))}
+            
+            ⚠️ IMPORTANT: Tailor your recommendations based on:
+            - Their industry type
+            - Their primary goal
+            - Their funding needs
+            - Their specific concerns
+            """
+        
         business_info = f"""
         BUSINESS KPI SUMMARY     
+        {profile_context}
 
             # 🧩BASIC METRICS
             • Total Revenue: {kpis['total_revenue']}
@@ -57,65 +90,108 @@ class LLMAgent:
             • Cash Flow Health: {kpis['cash_flow_health']}
             • Market Position: {kpis['market_position']}
             """
-         #LLM prompt that guide it 
+        
+        #LLM prompt that guide it 
         prompt = f"""
-        You are an highly expert business performance analyst and startup mentor.
+        You are an elite startup advisor, financial analyst, and business strategist with deep expertise in reading business KPIs and identifying strategic actions.
 
-        Analyze the following KPI data and create a detailed, structured business performance report.
+        Your job: Generate an extremely detailed, realistic, and data-backed business report using the KPI data and business profile below.
 
-        **Instructions:**
-        1. Output strictly in **JSON format**.
-        2. Use **simple, friendly language** (no jargon).
-        3. Structure the report as follows:
+        ⚙️ OUTPUT FORMAT — STRICTLY JSON ONLY (no markdown, no extra text):
 
-        {
-        "metrics_analysis": {
-            "metric_name": {
-            "value": number,
-            "status": "Good / Average / Poor",
-            "meaning": "Short simple explanation of this metric",
-            "reason": "Why it is in this condition",
-            "proof": "Data-based justification (like trends, ratios, etc.)",
-            "suggestion": "How to improve or maintain this metric"
-            },
-            ...
-        },
+        {{
+        "executive_summary": {{
+            "overview": "Comprehensive yet concise summary of current business health and trajectory",
+            "business_stage": "Which stage this business seems to be in (early, growth, maturity, decline)",
+            "confidence_score": "0-100 (based on how financially and operationally strong the business looks)"
+        }},
 
-        "summary": {
-            "business_health": "Brief summary of how the business is performing overall",
-            "key_strengths": ["List of top performing areas"],
-            "key_weaknesses": ["List of weak areas that need attention"]
-        },
+        "metric_diagnostics": {{
+            "financial_performance": [
+                {{
+                    "metric": "Revenue Growth Rate",
+                    "value": "{kpis.get('revenue_growth_rate', 0)}",
+                    "assessment": "Excellent / Good / Weak / Declining",
+                    "analysis": "Explain why it's in this condition based on data trends or ratios",
+                    "impact": "Explain how this affects profit, sustainability, or scaling",
+                    "improvement_plan": "3-step plan to fix or enhance this metric"
+                }},
+                ...
+            ],
+            "operational_efficiency": [
+                {{
+                    "metric": "Burn Rate",
+                    "value": "{kpis.get('burn_rate', 0)}",
+                    "assessment": "Sustainable / High / Critical",
+                    "analysis": "Explain how the burn rate affects runway and funding needs",
+                    "impact": "Impact on cash flow and long-term survival",
+                    "recommendation": "Specific strategies to reduce burn rate or improve unit economics"
+                }}
+            ],
+            "market_and_scalability": [
+                {{
+                    "metric": "Scalability Score",
+                    "value": "{kpis.get('scalability_score', 0)}",
+                    "analysis": "How ready the business is to scale given operations and margins",
+                    "recommendation": "Explain how to prepare for next growth phase"
+                }}
+            ]
+        }},
 
-        "alerts": {
-            "financial_alerts": ["Any major cost, loss or declining trend warnings"],
-            "growth_alerts": ["Any risk to future scalability or market share"]
-        },
+        "strategic_recommendations": {{
+            "short_term_actions": [
+                "Precise 3-6 actionable improvements for next quarter (data-driven, realistic)"
+            ],
+            "mid_term_strategies": [
+                "Operational or marketing changes to strengthen growth trajectory"
+            ],
+            "long_term_plan": [
+                "Strategic goals for 12+ months to reach investment-readiness or IPO readiness"
+            ]
+        }},
 
-        "what_is_going_well": {
-            "positive_trends": ["Metrics or patterns that show success"],
-            "recommend_to_continue": ["Practices that should be continued or scaled"]
-        },
+        "business_context_analysis": {{
+            "profile_summary": "{business_profile if business_profile else 'No profile provided'}",
+            "contextual_insights": "Analyze how the business’s goals, funding needs, and concerns affect recommendations.",
+            "industry_comparison": "Comment how this business stands vs typical industry performance patterns"
+        }},
 
-        "future_advice": {
-            "short_term": ["Immediate next 3 months actions"],
-            "long_term": ["6-12 month business strategy improvements"]
-        },
+        "alerts_and_risks": {{
+            "financial_alerts": [
+                "Major cost or cash flow warnings with quantitative reasons"
+            ],
+            "growth_alerts": [
+                "Risks to market share, expansion, or scaling readiness"
+            ],
+            "operational_risks": [
+                "Any inefficiencies, over-dependencies, or low-performing segments"
+            ]
+        }},
 
-        "conclusion": {
-            "final_assessment": "1 paragraph summarizing the overall condition, growth stage, and future readiness of the business",
-            "confidence_score": "0-100 (how healthy the business seems overall)"
-        }
-        }
+        "conclusion": {{
+            "final_diagnosis": "Holistic narrative combining KPIs + context + strategy readiness",
+            "priority_focus_areas": ["Top 3 things to fix or continue immediately"],
+            "positive_highlights": ["Metrics or behaviors that indicate strength"]
+        }}
+        }}
 
-        4. Use the KPI values below to generate your analysis:
+        🧩 DATA INPUTS:
         {business_info}
 
-        Make the report extremely insightful, actionable, and easy to read.
-        If something looks dangerous or risky, mention it clearly in the alerts section.
-        Ensure the response is strictly valid JSON — no explanations, no markdown.
+        📋 CONTEXT (if provided):
+        {profile_context}
 
+        ⚠️ CRITICAL RULES:
+        - Output must be extremely detailed (at least 10,000 characters total).
+        - Every insight should be specific, logical, and backed by metric evidence.
+        - Avoid repeating generic lines like “reduce cost” or “increase marketing”.
+        - Include interrelations (e.g., “high burn rate despite high growth means scaling too fast”).
+        - Always provide a clear reasoning chain (“because X, therefore Y, suggesting Z”).
+        - The report should sound like it was written by a consulting firm such as McKinsey or Bain.
+
+        Ensure your output is **valid JSON only**, no markdown or commentary outside JSON.
         """
+
 
         #Return the result 
         response = self.client.chat.completions.create(
