@@ -430,6 +430,76 @@
             }
         });
 
+                // ============================================
+        // CHECK IF ANALYSIS ALREADY EXISTS
+        // ============================================
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedData = localStorage.getItem('businessAnalysis');
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                const savedTime = new Date(data.savedAt);
+                const timeAgo = Math.floor((Date.now() - savedTime) / 1000 / 60); // minutes
+                
+                // Show option to view existing analysis
+                const banner = document.createElement('div');
+                banner.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+                    color: white;
+                    padding: 15px;
+                    text-align: center;
+                    z-index: 9999;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                `;
+                banner.innerHTML = `
+                    <strong>📊 Previous Analysis Found!</strong> 
+                    (Saved ${timeAgo < 60 ? timeAgo + ' min' : Math.floor(timeAgo/60) + ' hr'} ago)
+                    <br>
+                    <button onclick="viewSavedAnalysis()" style="
+                        margin: 10px 5px 0 5px;
+                        padding: 8px 20px;
+                        background: white;
+                        color: #27ae60;
+                        border: none;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">📈 View Dashboard</button>
+                    <button onclick="clearOldData()" style="
+                        margin: 10px 5px 0 5px;
+                        padding: 8px 20px;
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        border: 1px solid white;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">🗑️ Start Fresh</button>
+                `;
+                document.body.prepend(banner);
+            }
+        });
+
+        // View saved analysis
+        function viewSavedAnalysis() {
+            const savedData = localStorage.getItem('businessAnalysis');
+            sessionStorage.setItem('businessData', savedData);
+            window.location.href = 'dashboard.html';
+        }
+
+        // Clear old data
+        function clearOldData() {
+            if (confirm('⚠️ This will delete your saved analysis. Continue?')) {
+                localStorage.removeItem('businessAnalysis');
+                location.reload();
+            }
+        }
+
         // Form submission
         document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
         e.preventDefault();

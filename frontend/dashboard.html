@@ -374,13 +374,42 @@
             border-color: #17a2b8;
             color: #0c5460;
         }
+
+        /* Saved indicator animation */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+
+
+
     </style>
 </head>
 <body>
     <!-- Top Header -->
     <div class="top-header">
-        <h1 id="businessName">Business Dashboard</h1>
-        <div class="business-info" id="businessInfo">Loading...</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 id="businessName">Business Dashboard</h1>
+                <div class="business-info" id="businessInfo">Loading...</div>
+            </div>
+            <button onclick="clearSavedData()" style="
+                padding: 10px 20px;
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: 2px solid white;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s;
+            " onmouseover="this.style.background='white'; this.style.color='#667eea'" 
+            onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.color='white'">
+                🗑️ Clear Saved Data
+            </button>
+        </div>
     </div>
 
     <!-- Navigation Bar -->
@@ -486,8 +515,62 @@
             event.target.classList.add('active');
         }
 
-        // Load data from sessionStorage
-        const businessData = JSON.parse(sessionStorage.getItem('businessData'));
+        // Clear saved data function
+        function clearSavedData() {
+            if (confirm('⚠️ This will delete your saved analysis and redirect to home. Continue?')) {
+                localStorage.removeItem('businessAnalysis');
+                sessionStorage.removeItem('businessData');
+                alert('✅ Data cleared successfully!');
+                window.location.href = 'index.html';
+            }
+        }
+
+                // ============================================
+        // LOAD DATA FROM SESSION OR LOCALSTORAGE
+        // ============================================
+
+        let businessData = null;
+
+        // Try sessionStorage first (fresh analysis)
+        let sessionData = sessionStorage.getItem('businessData');
+        if (sessionData) {
+            businessData = JSON.parse(sessionData);
+            console.log('📊 Loaded from session (fresh analysis)');
+        }
+
+        // Fallback to localStorage (saved analysis)
+        if (!businessData) {
+            let savedData = localStorage.getItem('businessAnalysis');
+            if (savedData) {
+                businessData = JSON.parse(savedData);
+                console.log('💾 Loaded from storage (saved analysis)');
+                
+                // Show restored banner
+                const banner = document.createElement('div');
+                banner.style.cssText = `
+                    position: fixed;
+                    top: 70px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #3498db;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    z-index: 9999;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                `;
+                banner.innerHTML = '♻️ Restored from saved data';
+                document.body.appendChild(banner);
+                setTimeout(() => banner.remove(), 3000);
+            }
+        }
+
+        // If still no data, redirect
+        if (!businessData) {
+            alert('❌ No analysis found! Please start a new analysis.');
+            window.location.href = 'index.html';
+        }
+
         // ADD THIS - Debug check
         console.log('=== DASHBOARD DATA CHECK ===');
         console.log('Has KPIs:', !!businessData?.kpis);
@@ -1022,7 +1105,7 @@ ${typeof rec === 'string' ? rec.substring(0, 500) : JSON.stringify(rec, null, 2)
             if (status.includes('high') || status.includes('warning')) return '#f39c12';
             return '#95a5a6';
         }
-        
+           
         // Render Full Report
         
         function renderReport() {
@@ -1062,6 +1145,57 @@ ${typeof rec === 'string' ? rec.substring(0, 500) : JSON.stringify(rec, null, 2)
             `;
             document.getElementById('reportContainer').innerHTML = html;
         }
+                // ============================================
+        // AUTO-SAVE TO LOCALSTORAGE FEATURE
+        // ============================================
+
+        // Function to save data
+        function saveToLocalStorage() {
+            try {
+                const dataToSave = {
+                    ...businessData,
+                    savedAt: new Date().toISOString()
+                };
+                localStorage.setItem('businessAnalysis', JSON.stringify(dataToSave));
+                console.log('✅ Analysis saved to browser storage');
+                
+                // Show saved indicator
+                showSavedIndicator();
+            } catch (e) {
+                console.error('❌ Save failed:', e);
+                if (e.name === 'QuotaExceededError') {
+                    alert('⚠️ Storage full! Clear old data.');
+                }
+            }
+        }
+
+        // Visual indicator
+        function showSavedIndicator() {
+            const indicator = document.createElement('div');
+            indicator.innerHTML = '💾 Saved';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                z-index: 9999;
+                animation: fadeInOut 2s;
+            `;
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => indicator.remove(), 2000);
+        }
+
+        // Auto-save when page loads
+        saveToLocalStorage();
+
+        // Save on any changes (optional)
+        window.addEventListener('beforeunload', saveToLocalStorage);
+
+        console.log('💾 Auto-save enabled');
 
         // Download PDF Report
         function downloadPDF() {
